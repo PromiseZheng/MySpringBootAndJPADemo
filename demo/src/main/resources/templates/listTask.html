@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>校园服务index</title>
+    <link th:href="@{/js/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript">
+    </script>
+    <style type="text/css">
+        .btn {
+            height: 35px;
+            width: 117px;
+            line-height: 35px;
+        }
+
+        .layui-table-cell {
+            height: 36px;
+            line-height: 36px;
+        }
+    </style>
+</head>
+<body class="layui-layout-body" th:background="@{/img/white-waves.png}">
+
+<div style="margin-left: 35%;margin-top: 5%;"><p style="font-size: 30px">当前跑腿任务列表</p></div>
+<table class="layui-hide" lay-filter="Demo" id="Demo"></table>
+
+<script th:src="@{/js/layui/layui.js}"></script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn btn layui-btn-xs" lay-event="edit">接受该跑腿</a>
+</script>
+
+<script th:inline="none">
+    //Demo
+
+    layui.use('table', function () {
+        var table = layui.table;
+        var $ = layui.$;
+        table.render({
+            elem: '#Demo'
+            , url: '/getAllTaskData'
+            , where: {name: parent.str} //如果无需传递额外参数，可不加该参数
+            , cols: [[
+                {field: 'taskid', width: 200, title: 'ID', hide: true, sort: true, align: 'center'}
+                , {field: 'taskPublisherId', width: 120, title: '用户名', align: 'center'}
+                , {field: 'taskName', width: 100, title: '任务名称', align: 'center'}
+                , {field: 'detail', width: 422, title: '任务描述', align: 'center'}
+                , {field: 'reciptId', width: 120, title: '接受用户', align: 'center'}
+                , {field: 'price', width: 120, title: '金额', sort: true, align: 'center'}
+                , {field: 'publishDate', width: 200, title: '发布时间', sort: true, align: 'center'}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150, align: 'center'}
+            ]]
+        });
+        //监听行工具事件
+        table.on('tool(Demo)', function (obj) {
+            var data = obj.data;
+            obj.data.acceptName = parent.str;
+            $.ajax({
+                type: 'post',
+                url: '/acceptTask',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(obj.data),
+                success: function (res) {
+                    layer.open({
+                        content: '接受成功',
+                        yes: function (index, layero) {
+                            //do something
+                            parent.window.location.href = "/store?name=" + parent.str;
+                        }
+                    })
+                }
+            })
+        });
+    });
+</script>
+</body>
+
+</html>

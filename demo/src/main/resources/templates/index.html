@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link th:href="@{/js/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript">
+    </script>
+    <style type="text/css">
+        .content {
+            background-color: white;
+            margin-left: 40%;
+            margin-top: 15%;
+            width: 300px;
+            height: 400px;
+        }
+
+        .input-in {
+            border-radius: 10px;
+        }
+    </style>
+    <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+</head>
+<body class="layui-layout-body" th:background="@{/img/background.png}">
+
+<div class="layui-tab layui-tab-brief content">
+    <p style="margin-left:36%;padding-top:22px;font-size: 26px;color: deepskyblue">IN校园</p>
+    <ul class="layui-tab-title filter">
+        <li class="layui-this" style="margin-left: 20px;color: deepskyblue">用户登录</li>
+        <li style="float: right;margin-right: 20px;color: deepskyblue">用户注册</li>
+
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <div class="layui-tab-item layui-show">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-top: 20px;margin-bottom: 0px">
+                    <label class="layui-form-label" style="width: 40px;text-align: center;margin-top: 3px">账号:</label>
+                    <div class="layui-input-block" style="margin-left: 80px">
+                        <input type="text" name="username" style="width:90%" placeholder="请输入账号" autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" style="margin-top: 30px;margin-bottom: 0px">
+                    <label class="layui-form-label" style="width: 40px;text-align: center;margin-top: 5px">密码:</label>
+                    <div class="layui-input-block" style="margin-left: 80px">
+                        <input type="password" name="password" style="width:90%" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" style="margin-top: 30px;margin-bottom: 0px">
+                    <button class="layui-btn" id="login" style="width: 70%;margin-left: 16%;" lay-filter="*">登录</button>
+                </div>
+            </form>
+        </div>
+        <div class="layui-tab-item">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-top: 20px;margin-bottom: 0px">
+                    <label class="layui-form-label" style="width: 40px;text-align: center;margin-top: 3px">账号:</label>
+                    <div class="layui-input-block" style="margin-left: 80px">
+                        <input type="text" name="registername" style="width:90%" placeholder="请输入账号" autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" style="margin-top: 30px;margin-bottom: 0px">
+                    <label class="layui-form-label" style="width: 40px;text-align: center;margin-top: 5px">密码:</label>
+                    <div class="layui-input-block" style="margin-left: 80px">
+                        <input type="password" name="registerpassword" style="width:90%" autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" style="margin-top: 30px;margin-bottom: 0px">
+                    <button class="layui-btn" id="register" style="width: 70%;margin-left: 16%;" lay-filter="*">注册
+                    </button>
+                </div>
+            </form>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/layui/layui.js}"></script>
+<script>
+    //JavaScript代码区域
+
+
+    layui.use(['element', 'layer', 'form'], function () {
+        var element = layui.element;
+        var $ = layui.$;
+        var layer = layui.layer;
+        var form = layui.form;
+        map = {};
+        new TencentCaptcha(
+            document.getElementById('login'), '2077935491', function (res) {
+                console.log(res);
+                if (res.ret == 0) {
+                    $.ajax({
+                        type: 'post',
+                        url: '/authorize',
+                        contentType: "application/json",
+                        async: false,
+                        dataType: 'json',
+                        data: JSON.stringify(res),
+                        success: function (res) {
+                            if (res == "1") {
+                                var p = "userName=" + $("input[name='username']").val() + "&password=" + $("input[name='password']").val();
+                                $.ajax({
+                                    type: "get",
+                                    url: "login",
+                                    data: p,
+                                    dataType: "text",
+                                    success: function (p) {
+                                        if (p == "task") {
+                                            layer.open({
+                                                content: '登录成功',
+                                                yes: function (index, layero) {
+                                                    //do something
+                                                    window.location.href = "/store?name=" + $("input[name='username']").val();
+                                                }
+                                            });
+                                        } else {
+                                            layer.open({
+                                                content: '用户名或密码错误',
+                                                yes: function (index, layero) {
+                                                    window.location.reload();
+                                                }
+                                            })
+                                        }
+                                    }, error: function (e) {
+                                        console.log(e);
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            }
+        )
+        // 绑定一个元素并手动传入场景Id和回调
+        new TencentCaptcha(
+            document.getElementById('register'),
+            '2077935491',
+            function (res) {
+                console.log(res)
+                // res（用户主动关闭验证码）= {ret: 2, ticket: null}
+                // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+                if (res.ret === 0) {
+                    $.ajax({
+                        type: "post",
+                        url: "/authorize",
+                        contentType: "application/json",
+                        async: false,
+                        dataType: "json",
+                        data: JSON.stringify(res),
+                        success: function (res) {
+                            if (res == "1") {
+                                var p = "userName=" + $("input[name='registername']").val() + "&password=" + $("input[name='registerpassword']").val();
+                                $.ajax({
+                                    type: 'get',
+                                    url: 'register',
+                                    data: p,
+                                    // contenType:"application/json",
+                                    dataType: "json",
+                                    success: function (p) {
+                                        if (p == "1") {
+                                            layer.open({
+                                                content: '注册成功',
+                                                yes: function (index, layero) {
+                                                    //do something
+                                                    window.location.reload();
+                                                }
+                                            });
+                                        } else {
+                                            if (p == "2")
+                                                layer.open({
+                                                    content: '用户名已存在，注册失败',
+                                                    yes: function (index, layero) {
+                                                        //do something
+                                                        window.location.reload();
+                                                    }
+                                                });
+                                            console.log("注册失败");
+                                        }
+                                    }, error: function (e) {
+                                        console.log(e);
+                                    }
+                                })
+                            }
+
+                        },
+                        error: function (err) {
+                            console.log(err);
+                        }
+                    })
+                }
+            },
+            {bizState: '自定义透传参数'}
+        );
+
+
+        $("#login").click(function () {
+            event.preventDefault();
+            if ($("input[name='username']").val().trim(" ") == "" || $("input[name='password']").val().trim(" ") == "") {
+                layer.msg("请输入正确的账号密码")
+                return;
+            }
+
+        });
+        $("#register").click(function () {
+            event.preventDefault();
+            if ($("input[name='registername']").val().trim(" ") == "" || $("input[name='registerpassword']").val().trim(" ") == "") {
+                layer.msg("请输入正确的账号密码")
+                return;
+            }
+
+
+        })
+
+    });
+</script>
+
+</body>
+</html>

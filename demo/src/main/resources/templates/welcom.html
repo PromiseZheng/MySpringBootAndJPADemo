@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>校园服务index</title>
+    <link th:href="@{/js/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript">
+    </script>
+    <style type="text/css">
+        .content {
+            background-color: white;
+            margin-left: 40%;
+            margin-top: 15%;
+            width: 300px;
+            height: 400px;
+        }
+
+        .input-in {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="layui-layout-body" th:background="@{/img/background.png}">
+<div>欢迎....
+</div>
+<script th:src="@{/js/layui/layui.js}"></script>
+<script>
+    //JavaScript代码区域
+    layui.use('element', function () {
+        var element = layui.element;
+
+    });
+</script>
+</body>
+
+</html>

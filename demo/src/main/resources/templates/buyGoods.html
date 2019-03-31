@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>校园服务index</title>
+    <link th:href="@{/js/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript">
+    </script>
+    <style type="text/css">
+        .btn {
+            height: 35px;
+            width: 117px;
+            line-height: 35px;
+        }
+
+        .layui-table-cell {
+            height: 36px;
+            line-height: 36px;
+        }
+    </style>
+</head>
+<body class="layui-layout-body" th:background="@{/img/white-waves.png}">
+
+<div style="margin-left: 40%;margin-top: 5%;"><p style="font-size: 30px">当前商品列表</p></div>
+<table class="layui-hide" lay-filter="Demo" id="Demo"></table>
+
+<script th:src="@{/js/layui/layui.js}"></script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn btn layui-btn-xs" lay-event="edit">购买此商品</a>
+</script>
+
+<script th:inline="none">
+    //Demo
+
+    layui.use('table', function () {
+        var table = layui.table;
+        var $ = layui.$;
+        table.render({
+            elem: '#Demo'
+            , url: '/getAllGoodsData'
+            , where: {name: parent.str} //如果无需传递额外参数，可不加该参数
+            , cols: [[
+                {field: 'goodsid', width: 200, title: '商品ID', hide: true, sort: true, align: 'center'}
+                , {field: 'goodsName', width: 200, title: '商品名称', align: 'center'}
+                , {field: 'detail', width: 383, title: "商品介绍", align: 'center'}
+                , {field: 'price', width: 120, title: '商品价格', align: 'center'}
+                , {field: 'sellerid', width: 200, title: '出售者姓名', sort: true, align: 'center'}
+                , {field: 'upToStoreDate', width: 200, title: '进货时间', sort: true, align: 'center'}
+                , {fixed: 'right', title: '购买', toolbar: '#barDemo', width: 150, align: 'center'}
+            ]]
+            , page: true
+        });
+        //监听行工具事件
+        table.on('tool(Demo)', function (obj) {
+            var data = obj.data;
+            obj.data.acceptName = parent.str;
+            $.ajax({
+                type: 'post',
+                url: '/buygoods',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(obj.data),
+                success: function (res) {
+                    if (res == "2") {
+                        layer.open({
+                            content: "您无法购买自己的物品",
+                            yes: function (index, layero) {
+                            }
+                        })
+                    } else if (res == "1") {
+                        layer.open({
+                            content: '购买成功',
+                            yes: function (index, layero) {
+                                //do something
+                                parent.window.location.href = "/store?name=" + parent.str;
+                            }
+                        })
+                    }
+
+                }
+            })
+        });
+    });
+</script>
+</body>
+
+</html>

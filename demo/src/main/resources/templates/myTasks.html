@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>my</title>
+    <link th:href="@{/js/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript">
+    </script>
+    <style type="text/css">
+        .btn {
+            height: 27px;
+            width: 70px;
+            line-height: 27px;
+        }
+
+        .layui-table-cell {
+            height: 36px;
+            line-height: 36px;
+        }
+    </style>
+</head>
+<body class="layui-layout-body" th:background="@{/img/white-waves.png}">
+<div style="display: inline-block;margin-left: 4%">
+    <div style="margin-left: 26%;margin-top: 5%;"><label style="font-size: 30px">接受的跑腿任务</label></div>
+    <table class="layui-hide" lay-filter="Demo1" id="Demo1"></table>
+
+</div>
+<div style="float:right;margin-right: 4%">
+    <div style="margin-left: 35%;margin-top: 5%;"><label style="font-size: 30px">发布的跑腿任务</label></div>
+    <table class="layui-hide" lay-filter="Demo2" id="Demo2"></table>
+</div>
+
+<script th:src="@{/js/layui/layui.js}"></script>
+
+<script type="text/html" id="barDemo1">
+    {{#  if(d.taskState=="2"){ }}
+    {{#   } }}
+    {{#  if(d.taskState=="0"){ }}
+    <a class="layui-btn layui-btn-danger btn layui-btn-xs" lay-event="delete">删除</a>
+    {{#   } }}
+    {{#  if(d.taskState=="1"){ }}
+    <a class="layui-btn layui-btn-danger btn layui-btn-xs" lay-event="delete">删除</a>
+    {{#   } }}
+</script>
+<script type="text/html" id="barDemo2">
+    {{#  if(d.taskState=="2"){ }}
+    {{#   } }}
+    {{#  if(d.taskState=="0"){ }}
+    <a class="layui-btn btn layui-btn-xs" lay-event="finish">完成</a>
+    {{#   } }}
+    {{#  if(d.taskState=="1"){ }}
+    <a class="layui-btn btn layui-btn-xs" lay-event="finish">完成</a>
+    {{#   } }}
+</script>
+<script th:inline="none">
+    //Demo
+
+    layui.use('table', function () {
+        var table = layui.table;
+        var $ = layui.$;
+        table.render({
+            elem: '#Demo2'
+            , url: '/getAllMyPubTaskData'
+            , width: 543
+            , where: {name: parent.str} //如果无需传递额外参数，可不加该参数
+            , cols: [[
+                {field: 'taskid', width: 200, title: 'ID', hide: true, sort: true, align: 'center'}
+                , {field: 'taskName', width: 100, title: '任务名称', align: 'center'}
+                , {field: 'reciptId', width: 100, title: '接受用户', align: 'center'}
+                , {field: 'price', width: 68, title: '金额', align: 'center'}
+                , {field: 'taskState', width: 68, title: '状态', align: 'center'}
+                , {field: 'publishDate', width: 100, title: '发布时间', sort: true, align: 'center'}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo1', width: 100, align: 'center'}
+            ]]
+            , page: true
+        });
+        table.render({
+            elem: '#Demo1'
+            , url: '/getAllMyRecTaskData'
+            , where: {name: parent.str} //如果无需传递额外参数，可不加该参数
+            , width: 543
+            , cols: [[
+                {field: 'taskid', width: 200, title: 'ID', hide: true, sort: true, align: 'center'}
+                , {field: 'taskName', width: 100, title: '任务名称', align: 'center'}
+                , {field: 'taskPublisherId', width: 100, title: '发布用户', align: 'center'}
+                , {field: 'detail', width: 169, title: '详情', align: 'center'}
+                , {field: 'price', width: 68, title: '金额', align: 'center'}
+                , {field: 'taskState', width: 100, title: '状态', align: 'center'}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo2', width: 100, align: 'center'}
+            ]]
+            , page: true
+            , done: function () {
+
+            }
+        });
+        //监听行工具事件
+        table.on('tool(Demo1)', function (obj) {
+            var data = obj.data;
+            obj.data.acceptName = parent.str;
+            $.ajax({
+                type: 'post',
+                url: '/finishTask',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(obj.data),
+                success: function (res) {
+                    layer.open({
+                        content: 'OK',
+                        yes: function (index, layero) {
+                            //do something
+                            parent.window.location.href = "/store?name=" + parent.str;
+                        }
+                    })
+                }
+            })
+        });
+        table.on('tool(Demo2)', function (obj) {
+            var data = obj.data;
+            obj.data.acceptName = parent.str;
+            $.ajax({
+                type: 'post',
+                url: '/deleteTask',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(obj.data),
+                success: function (res) {
+                    layer.open({
+                        content: '删除成功',
+                        yes: function (index, layero) {
+                            //do something
+                            parent.window.location.href = "/store?name=" + parent.str;
+                        }
+                    })
+                }
+            })
+        });
+    });
+</script>
+</body>
+
+</html>

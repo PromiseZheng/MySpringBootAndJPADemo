@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>校园服务index</title>
+    <link th:href="@{/js/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript">
+    </script>
+    <style type="text/css">
+        .content {
+            background-color: white;
+            margin-left: 40%;
+            margin-top: 15%;
+            width: 300px;
+            height: 400px;
+        }
+
+        .input-in {
+            border-radius: 10px;
+        }
+
+        .layui-form-item {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body class="layui-layout-body" th:background="@{/img/white-waves.png}">
+<div>
+    <div style="margin-left: 29%;margin-top: 8%;"><p style="font-size: 30px">商品发布</p></div>
+    <form class="layui-form" style="margin:4% 20% 0px 20%" action="">
+        <!--<div class="layui-upload">-->
+        <!--<button type="button" style="margin-left: 10px" class="layui-btn" id="test1">上传图片</button>-->
+        <!--<div class="layui-upload-list "style="display: inline-block;margin-left:20px">-->
+        <!--<img class="layui-upload-img" style="width: 200px;height: 200px" id="demo1">-->
+        <!--<label id="demoText" style="display: none"></label>-->
+        <!--</div>-->
+        <!--</div>-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品名称：</label>
+            <div class="layui-input-inline">
+                <input type="text" id="goodsname" name="title" required lay-verify="required" placeholder="请输入名称"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布人：</label>
+            <div class="layui-input-inline">
+                <input type="text" id="name" name="name" required lay-verify="required" disabled autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品价格：</label>
+            <div class="layui-input-inline">
+                <input type="number" id="price" name="price" required lay-verify="required|Num" placeholder="请输入价格"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">元</div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">详细描述：</label>
+            <div class="layui-input-block">
+                <textarea name="desc" id="detail" placeholder="请输入内容" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" id="submit" lay-submit lay-filter="formDemo">立即提交</button>
+            </div>
+        </div>
+    </form>
+
+    <script th:src="@{/js/layui/layui.js}"></script>
+    <script th:inline="javascript">
+        //Demo
+        layui.use(['form', 'upload'], function () {
+            var form = layui.form;
+            var $ = layui.$//,upload=layui.upload;
+            console.log(parent.window.str)
+            $("#name").val(parent.window.str);
+            // //普通图片上传
+            // var uploadInst = upload.render({
+            //     elem: '#test1'
+            //     ,url: '/upload'
+            //     ,before: function(obj){
+            //         //预读本地文件示例，不支持ie8
+            //         obj.preview(function(index, file, result){
+            //             $('#demo1').attr('src', result); //图片链接（base64）
+            //         });
+            //     }
+            //     ,done: function(res){
+            //         event.preventDefault();
+            //         //如果上传失败
+            //         if(res.code > 0){
+            //             return layer.msg('上传失败');
+            //         }
+            //         $("#demoText").val(res.data.src);
+            //         //上传成功
+            //     }
+            //     ,error: function(){
+            //         event.preventDefault();
+            //         //演示失败状态，并实现重传
+            //         var demoText = $('#demoText');
+            //         demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            //         demoText.find('.demo-reload').on('click', function(){
+            //             uploadInst.upload();
+            //         });
+            //     }
+            // });
+            form.verify({
+                Num: function (value, item) {
+                    if (value < 0) {
+                        return "请填入正确的金额"
+                    }
+                }
+            })
+            $("#submit").click(function () {
+                event.preventDefault();
+                var jsonData = {};
+                jsonData["goodsname"] = $("#goodsname").val();
+                jsonData['price'] = $("#price").val();
+                if ($("#price").val() < 0) {
+                    return;
+                }
+                jsonData['detail'] = $("#detail").val();
+                jsonData["sellerid"] = parent.window.str;
+                $.ajax({
+                    type: 'post',
+                    url: '/setGoods',
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false,
+                    data: JSON.stringify(jsonData),
+                    success: function (res) {
+                        console.log("ppp");
+                        layer.open({
+                            content: '提交成功',
+                            yes: function (index, layero) {
+                                //do something
+                                parent.window.location.href = "/store?name=" + parent.window.str;
+                            }
+                        })
+                    }
+                })
+            });
+        });
+
+    </script>
+
+</body>
+</html>

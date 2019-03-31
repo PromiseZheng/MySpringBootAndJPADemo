@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>test</title>
+    <style type='text/css'>
+        .left {
+            width: 100px;
+            height: 100%;
+            margin-top: -100px;
+            background-color: #40AFFE;
+        }
+
+        .middle {
+            height: 100%;
+            margin: 0px 100px 0px 100px;
+            background-color: #5FB878;
+        }
+
+        .right {
+            margin-top: -100px;
+            height: 100%;
+            width: 100px;
+            float: right;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<div style="height: 100px">
+    <ul>
+        <li>a</li>
+        <li>a</li>
+        <li>a</li>
+    </ul>
+</div>
+<script type="text/javascript">
+    var x = 1;
+
+    function a() {
+        console.log(x);
+        var x = 2;
+        x++;
+        console.log(x);
+    }
+
+    // function b() {
+    //     console.log(x);
+    //     x++;
+    //     console.log(x);
+    // }
+    // 0<1<0?a():b();
+    // 0<1<2?a():b();
+    a();
+
+</script>
+</body>
+</html>
